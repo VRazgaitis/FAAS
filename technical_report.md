@@ -45,7 +45,7 @@ The task dispatcher operates in three configurable modes: ```[local/pull/push]``
   <img src="imgs/local_dispatcher_arch.png" width="60%" alt="System Architecture">
 </div>
 
-This dispatcher follows a simple event-triggered architecture, where the task dispatcher listens over the PUB-SUB Redis channel for newly logged tasks and dispatches them immediately. The __client__ plays the instigating role by logging a task at the API, which triggers a braodcasted message over the Redis `TASKS_CHANNEL`
+This dispatcher follows a simple event-triggered architecture, where the task dispatcher listens over the PUB-SUB Redis channel for newly logged tasks and dispatches them immediately. The __client__ plays the instigating role by logging a task at the API, which triggers a broadcasted message over the Redis `TASKS_CHANNEL`
 - Tasks are executed within the dispatcher using Python’s `multiprocessing` pool
 - Ideal for development and testing
 

@@ -40,23 +40,23 @@ Redis serves as the single source of truth for tracking task state, avoiding con
 
 ### 3. Task Dispatcher Architecture
 The task dispatcher operates in three configurable modes: ```[local/pull/push]```. In conceptualizing these modes, we focused on identifying the instigator of events that triggers responsive behaviors by the task dispatcher.<br><br>
+### Local Mode
+
 <div>
   <img src="imgs/local_dispatcher_arch.png" width="75%" alt="System Architecture">
 </div>
-
-### Local Mode
 This dispatcher follows a simple event-triggered architecture, where the task dispatcher listens over the PUB-SUB Redis channel for newly logged tasks and dispatches them immediately. The __client__ plays the instigating role by logging a task at the API, which triggers a braodcasted message over the Redis `TASKS_CHANNEL`
 - Tasks are executed within the dispatcher using Python’s `multiprocessing` pool
 - Ideal for development and testing
 
 
 ---
+### Push Mode
 
 <div>
-  <img src="imgs/push_disp_arch.png" width="75%" alt="System Architecture">
+  <img src="imgs/PUSH_dispatcher.png" width="75%" alt="System Architecture">
 </div>
 
-### Push Mode
 For the push task dispatcher, we designed a hybrid event-event driven / polling architecture to efficiently reduce the task queue. The __dispatcher__ behaves as the instigator in this architecture, opperating under a principle of "my workers should always be busy, and I'll fetch them new
 tasks as needed to enforce this worker state" 
 
@@ -68,12 +68,12 @@ tasks as needed to enforce this worker state"
   - Tasks from failed workers are reassigned to Redis
 
 --- 
+### Pull Mode
 
 <div>
-  <img src="imgs/pull_dispatch_arch.png" width="75%" alt="System Architecture">
+  <img src="imgs/PULL_dispatcher.png" width="75%" alt="System Architecture">
 </div>
 
-### Pull Mode
 For pull mode, we designed an event-driven architecture, where "hungry" workers aggressively pursue tasks by bombarding the task dispatcher with new work requests. The instigator is the __hungry worker__ coming online; doing so sends a message to the dispatcher that the worker is ready for tasks. After completing its first task, the hungry worker repeatedly requests the dispatcher to fetch Redis tasks on its behalf.
 
 - Workers request tasks using **REQ/REP** ZMQ sockets

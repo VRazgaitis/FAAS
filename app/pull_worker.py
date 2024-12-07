@@ -13,7 +13,7 @@ import time
 
 def parse_args():
     """
-    Parse command-line arguments for configuring the pull worker.
+    Parse CLI arguments when launching the worker
 
     Returns:
         argparse.Namespace: A namespace object containing the parsed arguments:
@@ -29,7 +29,8 @@ def parse_args():
 
 def launch_pull_worker(dispatcher_url):
     """
-    Launch a ZeroMQ pull worker that connects to the task dispatcher and broadcasts its name.
+    Launch a ZeroMQ pull worker that connects to the task dispatcher and broadcasts its
+    name and constatly requests tasks when not actively computing
 
     - Creates a ZeroMQ socket in `zmq.REQ` mode.
     - Generates a unique worker name using UUID.

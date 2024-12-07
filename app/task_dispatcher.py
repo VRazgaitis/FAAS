@@ -21,7 +21,6 @@ r = redis.Redis(
     db=REDIS_DB_INDEX,
     decode_responses=True)
 
-
 def parse_args():
     parser = argparse.ArgumentParser(description='MPCSFaaS Task Dispatcher')
     parser.add_argument("-mode", required=True, type=str,
@@ -37,12 +36,10 @@ def parse_args():
             "The --port argument is required for 'pull' and 'push' modes.")
     return args
 
-
 def write_to_redis(r, task_id, func_status, result_payload):
     """Updates task status and result in Redis."""
     r.hset(task_id, mapping={'status': func_status})
     r.hset(task_id, mapping={'result': utils.serialize(result_payload)})
-
 
 def assign_task_to_worker(task_id, worker_id, router_socket, worker_type):
     """
@@ -85,7 +82,6 @@ def assign_task_to_worker(task_id, worker_id, router_socket, worker_type):
         router_socket.send_string(serialized_data)
     print(f"Sent task {task_id} to worker {worker_id}")
 
-
 def send_empty_task_queue_msg(router_socket, worker_id):
     """
     Sends a message to a PULL worker indicating that there are no tasks in the queue.
@@ -100,7 +96,6 @@ def send_empty_task_queue_msg(router_socket, worker_id):
     empty_queue_msg = {'type': 'NO_TASKS', 'for_worker': worker_id}
     serialized_data = json.dumps(empty_queue_msg)
     router_socket.send_string(serialized_data)
-
 
 def update_worker_state(worker_states, worker_id, task_id=None, new_state='IDLE'):
     """
@@ -129,7 +124,6 @@ def update_worker_state(worker_states, worker_id, task_id=None, new_state='IDLE'
         worker_states[worker_id]['task_id'] = task_id
         worker_states[worker_id]['missed_heartbeats'] = 0
 
-
 def get_next_queued_task():
     """
     Searches Redis for the first task with the status 'QUEUED'.
@@ -146,7 +140,6 @@ def get_next_queued_task():
         if task_status == 'QUEUED':
             return key
     return None
-
 
 def process_worker_result(worker_id, worker_data, worker_states):
     """
@@ -187,7 +180,6 @@ def process_worker_result(worker_id, worker_data, worker_states):
     worker_states[worker_id]['task_id'] = None
     worker_states[worker_id]['missed_heartbeats'] = 0
 
-
 def handle_worker_error(worker_id, worker_data, worker_states):
     """
     Handles an error reported by a worker and updates its state accordingly.
@@ -206,7 +198,6 @@ def handle_worker_error(worker_id, worker_data, worker_states):
     worker_states[worker_id]['status'] = 'FAILED'
     worker_states[worker_id]['task_id'] = None
     worker_states[worker_id]['missed_heartbeats'] = 0
-
 
 def run_dispatcher_local():
     # Create a pubsub object
@@ -230,7 +221,6 @@ def run_dispatcher_local():
                         r, new_task_id, func_status, result_payload)
                     print(
                         f'task ran succeffully with result: {result_payload}')
-
 
 def run_dispatcher_push_mode(DISPATCHER_MODE, DISPATCHER_PORT):
     # Set up ZMQ context and sockets in ROUTER pattern to distribute tasks
@@ -395,7 +385,6 @@ def run_dispatcher_push_mode(DISPATCHER_MODE, DISPATCHER_PORT):
             # Schedule next heartbeat
             next_heartbeat_time = current_time + HEARTBEAT_INTERVAL
 
-
 def run_dispatcher_pull_mode(DISPATCHER_MODE, DISPATCHER_PORT):
     # Track metadata on workers as they come online, receive tasks, crash, etc.
     worker_states = {}
@@ -492,7 +481,6 @@ def run_dispatcher_pull_mode(DISPATCHER_MODE, DISPATCHER_PORT):
                 new_state='FAILED')
             dispatcher_socket.send_string(
                 f"Dispatcher received error from {sender} and decommissioned it")
-
 
 if __name__ == "__main__":
     args = parse_args()

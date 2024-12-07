@@ -13,6 +13,14 @@ import uuid
 
 
 def parse_args():
+    """
+    Parse CLI arguments when launching the worker
+
+    Returns:
+        argparse.Namespace: A namespace object containing the parsed arguments:
+            - num_worker_processors (int): Number of worker processors to spawn.
+            - dispatcher_url (str): The URL of the task dispatcher (e.g., tcp://localhost:5555).
+    """
     parser = argparse.ArgumentParser(description='Push Worker for MPCSFaaS')
     parser.add_argument('num_worker_processors', type=int,
                         help='Number of worker processors')
@@ -20,14 +28,26 @@ def parse_args():
                         help='Dispatcher URL (e.g., tcp://localhost:5555)')
     return parser.parse_args()
 
-
 def worker_function(dispatcher_url):
     """
-    Function that each worker process will run.
+    Worker process function for distributed task execution.
+
+    This function connects to a dispatcher via a ZeroMQ DEALER socket, 
+    registers itself, and processes tasks assigned by the dispatcher. 
+    Tasks are executed asynchronously using a multiprocessing pool. 
+    The worker also responds to heartbeat messages and handles errors gracefully.
 
     Args:
         dispatcher_url (str): The URL of the dispatcher to connect to.
-        worker_number (int): Unique number identifying the worker.
+
+    Behavior:
+        - Registers itself with the dispatcher upon connection.
+        - Processes tasks sent by the dispatcher:
+          - Deserializes the function and its arguments.
+          - Executes the task using a multiprocessing pool.
+          - Sends the result or status back to the dispatcher.
+        - Responds to heartbeat messages to maintain a connection with the dispatcher.
+        - Handles and reports errors during task execution or communication.
     """
     context = zmq.Context()
     dealer_socket = context.socket(zmq.DEALER)
@@ -107,7 +127,6 @@ def worker_function(dispatcher_url):
                 [b'', utils.serialize(error_message).encode('utf-8')]
             )
             continue
-
 
 def main():
     args = parse_args()

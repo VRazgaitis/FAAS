@@ -40,7 +40,7 @@ Redis serves as the single source of truth for tracking task state, avoiding con
 
 ### 3. Task Dispatcher Architecture
 The task dispatcher operates in three configurable modes: ```[local/pull/push]```. In conceptualizing these modes, we focused on identifying the instigator of events that triggers responsive behaviors by the task dispatcher.<br><br>
-### Local Mode
+## Local Mode
 
 <div>
   <img src="imgs/local_dispatcher_arch.png" width="75%" alt="System Architecture">
@@ -51,7 +51,7 @@ This dispatcher follows a simple event-triggered architecture, where the task di
 
 
 ---
-### Push Mode
+## Push Mode
 
 <div>
   <img src="imgs/PUSH_dispatcher.png" width="75%" alt="System Architecture">
@@ -68,7 +68,7 @@ tasks as needed to enforce this worker state"
   - Tasks from failed workers are reassigned to Redis
 
 --- 
-### Pull Mode
+## Pull Mode
 
 <div>
   <img src="imgs/PULL_dispatcher.png" width="75%" alt="System Architecture">

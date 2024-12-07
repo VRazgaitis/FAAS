@@ -36,7 +36,6 @@ Redis Hashes are more compact than serialized JSON, and can be rapidly retrieved
 
 Redis serves as the single source of truth for tracking task state, avoiding consensus issues.
 
----
 
 ### 3. Task Dispatcher Architecture
 The task dispatcher operates in three configurable modes: ```[local/pull/push]```. In conceptualizing these modes, we focused on identifying the instigator of events that triggers responsive behaviors by the task dispatcher.<br><br>
@@ -50,7 +49,7 @@ This dispatcher follows a simple event-triggered architecture, where the task di
 - Ideal for development and testing
 
 
----
+
 ## Push Mode
 
 <div>
@@ -67,7 +66,7 @@ tasks as needed to enforce this worker state"
   - Heartbeat messages ensure worker health
   - Tasks from failed workers are reassigned to Redis
 
---- 
+ 
 ## Pull Mode
 
 <div>

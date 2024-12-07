@@ -44,6 +44,7 @@ The task dispatcher operates in three configurable modes: ```[local/pull/push]``
 <div>
   <img src="imgs/local_dispatcher_arch.png" width="75%" alt="System Architecture">
 </div>
+
 This dispatcher follows a simple event-triggered architecture, where the task dispatcher listens over the PUB-SUB Redis channel for newly logged tasks and dispatches them immediately. The __client__ plays the instigating role by logging a task at the API, which triggers a braodcasted message over the Redis `TASKS_CHANNEL`
 - Tasks are executed within the dispatcher using Python’s `multiprocessing` pool
 - Ideal for development and testing
@@ -112,11 +113,9 @@ A comprehensive testing report can be seen by opening `htmlcov/index.html` in a 
 </div>
 
 ### Coverage testing package instructions:
-* Run pytest with coverage scanning enabled with ```coverage run -m pytest``` 
+* Run pytest with coverage scanning enabled with ```coverage run -m pytest``` from project root directory
 * Afterwards, run ```coverage report -m``` to get a console print of test coverage, or
 * run ```coverage html``` to get a hyperlink to a full-blown tests report
-* Subsequent runs of the project after having generated the coverage report can sometimes cause bugs involving ModuleNotFoundError importing 'tests'. 
-run ```rm -rf htmlcov/*``` to purge tracer files and remove this error
 
 ## 5. Performance Evaluation
 A performance evaluation client was implemented to compare the modes:

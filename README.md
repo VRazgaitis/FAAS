@@ -1,14 +1,13 @@
 # Function as a Service (FaaS) Final Project
 
-## Overview
-MPCSFaaS is a Function-as-a-Service (FaaS) platform enabling users to execute Python functions in a serverless environment. It provides a RESTful API, a task dispatcher, and worker pools integrated with a Redis database. The system operates in three modes—`local`, `pull`, and `push`—each facilitating task assignment differently. 
+MPCSFaaS is a Function-as-a-Service (FaaS) platform enabling users to execute Python functions in a serverless environment. It provides a RESTful API, a task dispatcher, and worker pools integrated with a Redis database. The system operates in three modes: `[local/pull/push]`, each using different task dispatching algorithms. 
 
 The main components of MPCSFaaS are:
-- **FastAPI-based RESTful API**: For managing function registration, execution, and status tracking.
-- **Redis Database**: For storing registered functions, tasks, and states.
-- **Task Dispatcher**: Orchestrates task distribution and manages worker states.
-- **Workers**: Execute tasks and return results.
-- **Message Channels**: Facilitate task communication between components.
+- **FastAPI-based RESTful API**: For managing function registration, execution, and status tracking
+- **Redis Database**: For storing registered functions, tasks, and states
+- **Task Dispatcher**: Orchestrates task distribution and manages worker states
+- **Workers**: Execute tasks and return results
+- **Message Channels**: Facilitate task communication between components
 
 
 <div align="center">

@@ -1,7 +1,5 @@
 # Function as a Service (FaaS) Final Project
-By Vaidas Razgaitis and Adam King
 
-## Overview
 MPCSFaaS is a Function-as-a-Service (FaaS) platform enabling users to execute Python functions in a serverless environment. It provides a RESTful API, a task dispatcher, and worker pools integrated with a Redis database. The system operates in three modes: `[local/pull/push]`, each using different task dispatching algorithms. 
 
 The main components of MPCSFaaS are:
@@ -25,6 +23,7 @@ The API handles:
 - **Task Execution**: Retrieves functions and parameters, queues tasks in Redis, and publishes task UUIDs on the `TASKS_CHANNEL`
 - **Status and Results Reporting**: Exposes endpoints to retrieve task statuses and results
 
+---
 
 ### 2. Redis Database
 Redis serves two primary purposes:
@@ -36,6 +35,7 @@ Redis Hashes are more compact than serialized JSON, and can be rapidly retrieved
 
 Redis serves as the single source of truth for tracking task state, avoiding consensus issues.
 
+---
 
 ### 3. Task Dispatcher Architecture
 The task dispatcher operates in three configurable modes: ```[local/pull/push]```. In conceptualizing these modes, we focused on identifying the instigator of events that triggers responsive behaviors by the task dispatcher.<br><br>
@@ -116,6 +116,8 @@ A comprehensive testing report can be seen by opening `htmlcov/index.html` in a 
 * Run pytest with coverage scanning enabled with ```coverage run -m pytest``` from project root directory
 * Afterwards, run ```coverage report -m``` to get a console print of test coverage, or
 * run ```coverage html``` to get a hyperlink to a full-blown tests report
+
+---
 
 ## 5. Performance Evaluation
 A performance evaluation client was implemented to compare the modes:

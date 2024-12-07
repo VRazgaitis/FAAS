@@ -14,8 +14,8 @@ The main components of MPCSFaaS are:
   <img src="imgs/system_architecture.png" width="50%" alt="System Architecture">
 </div>
 
-## Architecture
-### 1. RESTful FastAPI
+# Architecture
+## 1. RESTful FastAPI
 The RESTful API is hosted using [FastAPI](https://fastapi.tiangolo.com/). FastAPI is a modern, fast web framework for building APIs with Python, taking advantage of type hinting. FastAPI provides excellent editor support and hosts production-ready code with interactive documentation.
 
 The API handles:
@@ -23,9 +23,9 @@ The API handles:
 - **Task Execution**: Retrieves functions and parameters, queues tasks in Redis, and publishes task UUIDs on the `TASKS_CHANNEL`
 - **Status and Results Reporting**: Exposes endpoints to retrieve task statuses and results
 
----
 
-### 2. Redis Database
+
+## 2. Redis Database
 Redis serves two primary purposes:
 1. **Key-Value Storage**: Stores registered functions, tasks, and task metadata as hashes for efficient retrieval
 2. **Pub-Sub Messaging**: Broadcasts new task UUIDs to the `TASKS_CHANNEL` for dispatchers
@@ -35,14 +35,14 @@ Redis Hashes are more compact than serialized JSON, and can be rapidly retrieved
 
 Redis serves as the single source of truth for tracking task state, avoiding consensus issues.
 
----
 
-### 3. Task Dispatcher Architecture
+
+## 3. Task Dispatcher Architecture
 The task dispatcher operates in three configurable modes: ```[local/pull/push]```. In conceptualizing these modes, we focused on identifying the instigator of events that triggers responsive behaviors by the task dispatcher.<br><br>
 ## Local Mode
 
 <div>
-  <img src="imgs/local_dispatcher_arch.png" width="75%" alt="System Architecture">
+  <img src="imgs/local_dispatcher_arch.png" width="70%" alt="System Architecture">
 </div>
 
 This dispatcher follows a simple event-triggered architecture, where the task dispatcher listens over the PUB-SUB Redis channel for newly logged tasks and dispatches them immediately. The __client__ plays the instigating role by logging a task at the API, which triggers a braodcasted message over the Redis `TASKS_CHANNEL`

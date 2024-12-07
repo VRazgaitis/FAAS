@@ -42,7 +42,7 @@ The task dispatcher operates in three configurable modes: ```[local/pull/push]``
 ## Local Mode
 
 <div>
-  <img src="imgs/local_dispatcher_arch.png" width="70%" alt="System Architecture">
+  <img src="imgs/local_dispatcher_arch.png" width="60%" alt="System Architecture">
 </div>
 
 This dispatcher follows a simple event-triggered architecture, where the task dispatcher listens over the PUB-SUB Redis channel for newly logged tasks and dispatches them immediately. The __client__ plays the instigating role by logging a task at the API, which triggers a braodcasted message over the Redis `TASKS_CHANNEL`
@@ -54,7 +54,7 @@ This dispatcher follows a simple event-triggered architecture, where the task di
 ## Push Mode
 
 <div>
-  <img src="imgs/PUSH_dispatcher.png" width="75%" alt="System Architecture">
+  <img src="imgs/PUSH_dispatcher.png" width="80%" alt="System Architecture">
 </div>
 
 For the push task dispatcher, we designed a hybrid event-event driven / polling architecture to efficiently reduce the task queue. The __dispatcher__ behaves as the instigator in this architecture, opperating under a principle of "my workers should always be busy, and I'll fetch them new

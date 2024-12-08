@@ -1,6 +1,6 @@
 # Function as a Service (FAAS) Project
 
-FAASS is a Function-as-a-Service (FAAS) platform enabling users to execute Python functions in a serverless environment. It provides a RESTful API, a task dispatcher, and worker pools integrated with a Redis database. The system operates in three modes: `[local/pull/push]`, each using different task dispatching algorithms. 
+FAAS is a Function-as-a-Service (FAAS) platform enabling users to execute Python functions in a serverless environment. It provides a RESTful API, a task dispatcher, and worker pools integrated with a Redis database. The system operates in three modes: `[local/pull/push]`, each using different task dispatching algorithms. 
 
 The main components of MPCSFaaS are:
 - **FastAPI-based RESTful API**: For managing function registration, execution, and status tracking

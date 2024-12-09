@@ -21,25 +21,25 @@ r = redis.Redis(host=REDIS_HOST,
 # Instantiate FastAPI
 app = FastAPI()
 
-class RegisterFn(BaseModel):
+class RegisterFunction(BaseModel):
     name: str
     payload: str
 
-class RegisterFnRep(BaseModel):
+class RegisterFunctionReply(BaseModel):
     function_id: uuid.UUID
 
-class ExecuteFnReq(BaseModel):
+class ExecuteFunctionRequest(BaseModel):
     function_id: uuid.UUID
     payload: str
 
-class ExecuteFnRep(BaseModel):
+class ExecuteFunctionReply(BaseModel):
     task_id: uuid.UUID
 
-class TaskStatusRep(BaseModel):
+class TaskStatusReply(BaseModel):
     task_id: uuid.UUID
     status: str
 
-class TaskResultRep(BaseModel):
+class TaskResultReply(BaseModel):
     task_id: uuid.UUID
     status: str
     result: str
@@ -67,20 +67,20 @@ def greet_client():
     return {"Hello": "please give us an A :)"}
 
 # https://fastapi.tiangolo.com/tutorial/response-model/#response_model-parameter
-@app.post("/register_function/", response_model=RegisterFnRep)
-def register_func(fn: RegisterFn) -> RegisterFnRep:
+@app.post("/register_function/", response_model=RegisterFunctionReply)
+def register_func(fn: RegisterFunction) -> RegisterFunctionReply:
     """
     Registers a function in the Redis database as a hash object. Clients must serialize the `fn_payload`
     using Python's `dill` library before including it in the request
 
     Args:
-        fn (RegisterFn): The function registration request containing:
+        fn (RegisterFunction): The function registration request containing:
             - `name` (str): The name of the function.
             - `payload` (str): A **SERIALIZED** representation of the function 
               created using Python's `dill` library.
 
     Returns:
-        RegisterFnRep: A response containing the unique `function_id` (UUID) 
+        RegisterFunctionReply: A response containing the unique `function_id` (UUID) 
         assigned to the registered function.
     """
     logging.info(f"Received register_function request: {fn}")
@@ -102,10 +102,10 @@ def register_func(fn: RegisterFn) -> RegisterFnRep:
         logging.error(f"Redis error during function registration: {e}")
         raise HTTPException(status_code=500, detail=f"Redis error: {e}")
     # https://fastapi.tiangolo.com/tutorial/response-model/#response-model-return-type
-    return RegisterFnRep(function_id=func_uuid)
+    return RegisterFunctionReply(function_id=func_uuid)
 
-@app.post("/execute_function/", response_model=ExecuteFnRep)
-def execute_func(fn: ExecuteFnReq) -> ExecuteFnRep:
+@app.post("/execute_function/", response_model=ExecuteFunctionReply)
+def execute_func(fn: ExecuteFunctionRequest) -> ExecuteFunctionReply:
     """
     Executes a previously registered function with given parameters.
 
@@ -115,13 +115,13 @@ def execute_func(fn: ExecuteFnReq) -> ExecuteFnRep:
     before including it in the request.
 
     Args:
-        fn (ExecuteFnReq): The execution request containing:
+        fn (ExecuteFunctionRequest): The execution request containing:
             - `function_id` (UUID): The unique identifier of the registered function.
             - `payload` (str): A serialized representation of the parameters 
               (e.g., args and kwargs) created using Python's `dill` library.
 
     Returns:
-        ExecuteFnRep: A response containing:
+        ExecuteFunctionReply: A response containing:
             - `task_id` (UUID): A unique identifier for the execution task.
 
     Raises:
@@ -158,10 +158,10 @@ def execute_func(fn: ExecuteFnReq) -> ExecuteFnRep:
     # publish the new task_id to the [Tasks] channel
     # https://redis-py.readthedocs.io/en/stable/advanced_features.html#publish-subscribe
     r.publish(TASKS_CHANNEL, str(task_uuid))
-    return ExecuteFnRep(task_id=task_uuid)
+    return ExecuteFunctionReply(task_id=task_uuid)
 
-@app.get("/status/{task_id}", response_model=TaskStatusRep)
-def get_status(task_id: uuid.UUID) -> TaskStatusRep:
+@app.get("/status/{task_id}", response_model=TaskStatusReply)
+def get_status(task_id: uuid.UUID) -> TaskStatusReply:
     """
     Retrieves the current status of a specific task.
 
@@ -171,7 +171,7 @@ def get_status(task_id: uuid.UUID) -> TaskStatusRep:
         task_id (uuid.UUID): The unique identifier of the task whose status is being requested.
 
     Returns:
-        TaskStatusRep: A response containing:
+        TaskStatusReply: A response containing:
             - `task_id` (UUID): The unique identifier of the task.
             - `status` (str): The current status of the task (e.g., 'QUEUED', 'RUNNING', or 'COMPLETE').
 
@@ -203,10 +203,10 @@ def get_status(task_id: uuid.UUID) -> TaskStatusRep:
             detail=f"Task with UUID {task_id} does not exist in Redis or has no status.")
 
     # Return the task status
-    return TaskStatusRep(task_id=task_id, status=task_status)
+    return TaskStatusReply(task_id=task_id, status=task_status)
 
-@app.get("/result/{task_id}", response_model=TaskResultRep)
-def get_result(task_id: uuid.UUID) -> TaskResultRep:
+@app.get("/result/{task_id}", response_model=TaskResultReply)
+def get_result(task_id: uuid.UUID) -> TaskResultReply:
     """
     Retrieves the final result of a specific task, if it has completed.
 
@@ -218,7 +218,7 @@ def get_result(task_id: uuid.UUID) -> TaskResultRep:
         task_id (uuid.UUID): The unique identifier of the task whose result is being requested.
 
     Returns:
-        TaskResultRep: A response containing:
+        TaskResultReply: A response containing:
             - `task_id` (UUID): The unique identifier of the task.
             - `status` (str): The status of the task (must be 'COMPLETE').
             - `result` (any): The result of the task.
@@ -252,4 +252,4 @@ def get_result(task_id: uuid.UUID) -> TaskResultRep:
             detail=f"Task {task_id} has not finished running.")
 
     # Return the task result
-    return TaskResultRep(task_id=task_id, status=task_status, result=task_result)
+    return TaskResultReply(task_id=task_id, status=task_status, result=task_result)

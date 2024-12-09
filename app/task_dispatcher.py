@@ -386,6 +386,31 @@ def run_dispatcher_push_mode(DISPATCHER_MODE, DISPATCHER_PORT):
             next_heartbeat_time = current_time + HEARTBEAT_INTERVAL
 
 def run_dispatcher_pull_mode(DISPATCHER_MODE, DISPATCHER_PORT):
+    """
+    Run the task dispatcher in PULL mode to manage worker-task interactions.
+
+    This dispatcher listens for incoming messages from PULL workers, assigns tasks from a Redis-backed task queue,
+    and tracks worker state and task deadlines. It processes three types of messages from workers:
+    
+    -`REQUEST_TASK`: When a worker requests a task, the dispatcher retrieves the next queued task from Redis,
+    assigns it to the requesting worker, and updates worker states. If no tasks are available, it sends an
+    "empty queue" message to the worker.
+    
+    -`RESULT`: When a worker submits results for a completed task, the dispatcher processes the result,
+    updates task metadata in Redis, and assigns a new task to the worker if available.
+    
+    -`ERROR`: When a worker reports an error, the dispatcher logs the error and marks the worker's state as `FAILED`.
+
+    Features:
+    1. Tracks and manages worker metadata (e.g., status, task assignment, deadlines).
+    2. Handles task requeueing in Redis for tasks that exceed their deadlines or fail.
+    3. Maintains a ZeroMQ `REP` socket to communicate with workers.
+    4. Ensures robust handling of edge cases, such as task queue exhaustion or worker errors.
+
+    Args:
+        DISPATCHER_MODE (str): The mode of the dispatcher (e.g., `PULL_WORKER`), used to determine worker communication protocols.
+        DISPATCHER_PORT (int): The port on which the dispatcher listens for worker messages.
+    """
     # Track metadata on workers as they come online, receive tasks, crash, etc.
     worker_states = {}
     # create container for ZeroMQ socket
@@ -403,16 +428,16 @@ def run_dispatcher_pull_mode(DISPATCHER_MODE, DISPATCHER_PORT):
         message_payload = json.loads(message)
         sender = message_payload['worker_id']
 
-        # console announce when somebody has joined our guild of fearless workers
+        # console announce when a new worker has come online
         if sender not in worker_states.keys():
             print(f'[{sender}] came online')
 
-        # Scan thru existing workers and update failed worker states
+        # Scan thru existing workers, checking for timedout tasks
         current_time = time.time()
         for worker_id, state in list(worker_states.items()):
             if state['status'] == 'WORKING' and state.get('deadline') and current_time > state['deadline']:
                 print(f"Task {state['task_id']} failed: deadline exceeded.")
-                # requeue task in Redis
+                # requeue the task in Redis
                 r.hset(worker_states[worker_id]['task_id'],
                        mapping={'status': 'QUEUED'})
                 # update worker states
@@ -434,7 +459,7 @@ def run_dispatcher_pull_mode(DISPATCHER_MODE, DISPATCHER_PORT):
                     sender,
                     queued_task_id,
                     new_state='WORKING')
-                # stamp with expected deadline
+                # stamp worker with expected deadline of new task
                 worker_states[sender]['deadline'] = current_time + \
                     DEADLINE_TIMEOUT
             # Redis Task Queue is empty - send message

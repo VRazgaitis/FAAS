@@ -65,7 +65,7 @@ tasks as needed to enforce this worker state"
 
 **Fault Tolerance and Worker Monitoring**:
   - Heartbeat messages ensure worker health
-  - Tasks from failed workers are reassigned to Redis
+  - Tasks from failed workers are reassigned to the Redis task queue
 
  
 ## Pull Mode
@@ -89,7 +89,7 @@ For pull mode, we designed an event-driven architecture, where "hungry" workers 
 ## 4. Testing Framework
 We used [coverage](https://coverage.readthedocs.io/en/7.6.8/) to expand on the pytesting framework. `Coverage` measures how much of your code is executed during tests, at a line-by-line level. These insights indicate effectiveness and level of coverage of the testing suite. Given more time, I would sniff around in the tool's codebase to see how to remove the test cases from reported "test coverage", as this 100% hit rate is not insightful. 
 
-Test cases were written to test API routes, return values, error status codes, and specific errors and `user journeys` that can be inspected by looking at function names of test functions in `tests/test_webservice.py`. 
+Test cases were written to test API routes, return values, error status codes, and specific errors and user journeys that can be inspected by looking at function names of test functions in `tests/test_webservice.py`. 
 
 ### TESTING SUMMARY
 ```
@@ -127,9 +127,6 @@ A performance evaluation client was implemented to compare the modes:
 - **For more detail**: Please see `technical_report.md`, `app/scaling_study.py`
 
 ## Setup and run (Linux/macOS only)
-__Note to grader__: 
-Our python files run as packages, which was a necessary trade-off to get the `coverage` tool to work for auto-generating test reports. This means that each python component needs to be ran with `python3 -m app.<python_name>`, rather than the requested `python3 <script.py>` instructions (Ie __add__ flag `-m` and __do not__ include `.py` ending). Additionally, we opted to use a `-mode` flag in place of the requested `-m` when launching the task dispatcher to avoid confusion. Sorry for the inconvenience.
-
 __Launch project__: 
 
 (all commands from root project dir unless `cd` specified)
